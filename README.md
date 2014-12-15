@@ -94,7 +94,8 @@ or
       curl -X PUT http://192.168.3.21:5984/example/test6 -d '{"_id":"test6", "myvar":"20"}'
       curl -X PUT http://192.168.3.21:5984/example/test7 -d '{"_id":"test7", "myvar":"10"}'
 
-: 
+Do a query on the docs
+
       SELECT id, doc->'myvar' AS myvar FROM example 
       WHERE id LIKE 'test%' AND CAST(doc->>'myvar' AS numeric) > 50
       ORDER BY myvar
@@ -107,6 +108,8 @@ or
       (3 rows)
 
 
+Update some of the docs
+
      UPDATE example 
      SET doc=json_object_set_key(
             doc::json, 'myvar'::text, (CAST(doc->>'myvar'::text AS numeric) + 50)::text
@@ -114,6 +117,12 @@ or
          from_pg=true  
      WHERE id LIKE 'test%' AND CAST(doc->>'myvar' AS numeric) < 60
  
+ Peform same query 
+ 
+    SELECT id, doc->'myvar' AS myvar FROM example 
+    WHERE id LIKE 'test%' AND CAST(doc->>'myvar' AS numeric) > 50
+    ORDER BY myvar
+
        id   | myvar 
      -------+-------
       test4 | "100"
@@ -125,6 +134,8 @@ or
       test6 | "70"
      (7 rows)
 
+
+And finally in couch
 
      curl -s -X POST '192.168.3.21:5984/example/_temp_view?include_docs=false' -H 'Content-Type: application/json' \
      -d '{"map":"function(doc) { emit(doc._id, doc.myvar) };"}'  
