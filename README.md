@@ -223,8 +223,8 @@ Then add it in the database you want to use:
 
     CREATE EXTENSION http
 
-If you havent already done it:
 
+If you havent already done it:
 
     CREATE TABLE since_checkpoints   
     (
@@ -235,8 +235,7 @@ If you havent already done it:
     )
 
 
-
---Function to put data into couchdb:
+Add function to put data into couchdb:
 
     CREATE OR REPLACE FUNCTION couchdb_put() RETURNS trigger AS $BODY$
     DECLARE
@@ -257,6 +256,8 @@ If you havent already done it:
     LANGUAGE plpgsql VOLATILE  
 
 
+Create table to hold the docs
+
     CREATE TABLE example
     (
       id text NOT NULL,
@@ -266,7 +267,7 @@ If you havent already done it:
     )
 
 
-Create trigger to stop data being inserted into the table from sql and send off to couch instead
+Create trigger pto stop data being inserted into the table from sql and send off to couch instead
 
     CREATE TRIGGER add_doc_to_couch 
     BEFORE INSERT OR UPDATE 
@@ -278,31 +279,44 @@ Note: All queries in postgres must have "from_pg=true" for inserts and updates o
 I plan to reverse this logic and make the libary include this so it will be possible to issue inserts/updates and exclude this field.
 
 You can now start the node client and give it a test.
+-----
+
+A few variable to tune in ./lib/index.js need to move to config options
+
+In checkpoint_changes function:
+
+    ckwait = 3 * 1000;  
+
+This is how often the stream is checkpointed when the stream is active. I would adjust this depending on how busy you couchdb is.  When the stream is idle this increases to 10 secs.
+
+In startFollowing function there is:
+  
+     stream.inactivity_ms = 30000;
 
 -----
 
 Note: On pgsql-http module install:
 
-See: https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules
+https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules
 
 For FreeBSD you need to have curl and gettext-tools installed.
 
-# gmake PG_CONFIG=/usr/local/bin/pg_config
-cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -I. -I./ -I/usr/local/include/postgresql/server -I/usr/local/include/postgresql/internal -I/usr/local/include/libxml2 -I/usr/include -I/usr/local/include -I/usr/local/include  -c -o http.o http.c
-http.c:89:1: warning: unused function 'header_value' [-Wunused-function]
-header_value(const char* header_str, const char* header_name)
+    # gmake PG_CONFIG=/usr/local/bin/pg_config
+    cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -I. -I./ -I/usr/local/include/postgresql/server -I/usr/local/include/postgresql/internal -I/usr/local/include/libxml2 -I/usr/include -I/usr/local/include -I/usr/local/include  -c -o http.o http.c
+    http.c:89:1: warning: unused function 'header_value' [-Wunused-function]
+    header_value(const char* header_str, const char* header_name)
 ^
-1 warning generated.
-cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -I. -I./ -I/usr/local/include/postgresql/server -I/usr/local/include/postgresql/internal -I/usr/local/include/libxml2 -I/usr/include -I/usr/local/include -I/usr/local/include  -c -o stringbuffer.o stringbuffer.c
-cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -shared -o http.so http.o stringbuffer.o -L/usr/local/lib -L/usr/local/lib -pthread -Wl,-rpath,/usr/lib:/usr/local/lib -fstack-protector -L/usr/local/lib -L/usr/lib  -L/usr/local/lib -Wl,--as-needed -Wl,-R'/usr/local/lib'  -L/usr/local/lib -lcurl
+    1 warning generated.
+    cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -I. -I./ -I/usr/local/include/postgresql/server -I/usr/local/include/postgresql/internal -I/usr/local/include/libxml2 -I/usr/include -I/usr/local/include -I/usr/local/include  -c -o stringbuffer.o stringbuffer.c
+    cc -O2 -pipe  -fstack-protector -fno-strict-aliasing -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fPIC -DPIC -shared -o http.so http.o stringbuffer.o -L/usr/local/lib -L/usr/local/lib -pthread -Wl,-rpath,/usr/lib:/usr/local/lib -fstack-protector -L/usr/local/lib -L/usr/lib  -L/usr/local/lib -Wl,--as-needed -Wl,-R'/usr/local/lib'  -L/usr/local/lib -lcurl
 
 
 
-# gmake PG_CONFIG=/usr/local/bin/pg_config install
-/bin/mkdir -p '/usr/local/lib/postgresql'
-/bin/mkdir -p '/usr/local/share/postgresql/extension'
-/bin/mkdir -p '/usr/local/share/postgresql/extension'
-/usr/bin/install -c -o root -g wheel -m 755  http.so '/usr/local/lib/postgresql/http.so'
-/usr/bin/install -c -o root -g wheel -m 644 http.control '/usr/local/share/postgresql/extension/'
-/usr/bin/install -c -o root -g wheel -m 644 http--1.0.sql '/usr/local/share/postgresql/extension/'
+    # gmake PG_CONFIG=/usr/local/bin/pg_config install
+    /bin/mkdir -p '/usr/local/lib/postgresql'
+    /bin/mkdir -p '/usr/local/share/postgresql/extension'
+    /bin/mkdir -p '/usr/local/share/postgresql/extension'
+    /usr/bin/install -c -o root -g wheel -m 755  http.so '/usr/local/lib/postgresql/http.so'
+    /usr/bin/install -c -o root -g wheel -m 644 http.control '/usr/local/share/postgresql/extension/'
+    /usr/bin/install -c -o root -g wheel -m 644 http--1.0.sql '/usr/local/share/postgresql/extension/'
 
