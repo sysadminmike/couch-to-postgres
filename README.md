@@ -290,8 +290,19 @@ In checkpoint_changes function:
 This is how often the stream is checkpointed when the stream is active. I would adjust this depending on how busy you couchdb is.  When the stream is idle this increases to 10 secs.
 
 In startFollowing function there is:
-  
+     // The inactivity timer is for time between *changes*, or time between the
+     // initial connection and the first change. Therefore it goes here.
      stream.inactivity_ms = 30000;
+
+-----
+
+TODOs 
+
+Deal with DELETE 
+
+Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
+
+I am working on a more complex daemon to deal with multiple couchdbs + API to allow adding removing of steams and recovering from postgres or couchdb restarting/loosing connection so may need to make a few changes to the libary. 
 
 -----
 
