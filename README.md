@@ -198,8 +198,84 @@ Create the table to store the couch docs:
 
 Start watching changes
 
-./bin/index.js
+   ./bin/index.js
 
 It will add a record to the since_checkpoints table and begin syncing.
 
 At this point you can now perform SELECT queries the docs within postgres as in the above example.
+
+
+-------
+
+To handle UPDATE/INSERT/(DELETE todo) more configuration is required.
+
+First install the postgres extension pgsql-http  at https://github.com/pramsey/pgsql-http 
+
+Before compling a small change need to be made to issue a PUT request instead of POST.
+In http.c line 377:
+
+    //CURL_SETOPT(http_handle, CURLOPT_POST, 1);  //Comment this out 
+    CURL_SETOPT(http_handle, CURLOPT_CUSTOMREQUEST, "PUT");  //Add this 
+
+See note about pgsql-http module install if you not sure how to install a postgres extension.
+
+Then add it in the database you want to use:
+
+    CREATE EXTENSION http
+
+If you havent already done it:
+
+
+    CREATE TABLE since_checkpoints   
+    (
+      pgtable text NOT NULL,
+      since numeric DEFAULT 0,
+      enabled boolean DEFAULT false,
+      CONSTRAINT since_checkpoint_pkey PRIMARY KEY (pgtable)
+    )
+
+
+
+--Function to put data into couchdb:
+
+    CREATE OR REPLACE FUNCTION couchdb_put() RETURNS trigger AS $BODY$
+    DECLARE
+        RES RECORD;
+    BEGIN
+     IF (NEW.from_pg) IS NULL THEN
+       RETURN NEW;
+     ELSE 
+       
+       SELECT headers FROM http_post('http://192.168.3.21:5984/' || TG_TABLE_NAME || '/' || NEW.id::text, '', NEW.doc::text, 'application/json'::text) INTO RES;    
+
+       --Need to check RES for response code
+       --RAISE EXCEPTION 'Result: %', RES;
+       RETURN null;
+     END IF;
+    END;
+    $BODY$
+    LANGUAGE plpgsql VOLATILE  
+
+
+    CREATE TABLE example
+    (
+      id text NOT NULL,
+      doc jsonb,
+      from_pg boolean, -- for trigger nothing stored here
+      CONSTRAINT example_pkey PRIMARY KEY (id);
+    )
+
+
+Create trigger to stop data being inserted into the table from sql and send off to couch instead
+
+    CREATE TRIGGER add_doc_to_couch 
+    BEFORE INSERT OR UPDATE 
+    ON example FOR EACH ROW EXECUTE PROCEDURE couchdb_put();
+
+
+Note: All queries in postgres must have "from_pg=true" for inserts and updates or the postgres will send the data to the table and not send it to couch.  
+
+I plan to reverse this logic and make the libary include this so it will be possible to issue inserts/updates and exclude this field.
+
+You can now fire start the node client and give it a test.
+
