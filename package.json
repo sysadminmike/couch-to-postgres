@@ -1,0 +1,32 @@
+{
+  "name": "couch-to-postgres",
+  "version": "0.0.1",
+  "description": "Node libary to watch CouchDB_changes and update PostgreSQL",
+  "main": "index.js",
+  "bin": {
+    "couch-to-postgres": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "postgresql",
+    "postgres",
+    "couchdb",
+    "couch",
+    "feed",
+    "changes",
+    "transfer"
+  ],
+  "author": "MikeW",
+  "license": "BSD",
+  "dependencies": {
+
+    "kew": "0.5.0-alpha.1",
+    "pg": "4.1.1",
+    "pg-escape": "0.0.3",
+    "async": "0.9.0",
+    "follow": "0.11.4",
+    "events": "1.0.2"
+  }
+}
