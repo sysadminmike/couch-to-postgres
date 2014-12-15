@@ -296,6 +296,16 @@ In startFollowing function there is:
 
 -----
 
+
+Performance wise compared to the php dumping script
+
+On a test with a couchdb of about 150Mb with 65k docs the node libary complete working through _changes in about 17 minutes to add all the docs to an empty table and then keeps it in sync.
+
+The couch-to-postgres-php-dumper script - https://github.com/sysadminmike/couch-to-postgres-php-dump takes about 28 minutes for the initial sync and 11 secs for a resync.
+
+
+
+-----
 TODOs 
 
 Deal with DELETE 
