@@ -181,7 +181,7 @@ Before starting it up create the since_checkpoints table
 	(
 	  pgtable text NOT NULL,
 	  since numeric DEFAULT 0,
-	  enabled boolean DEFAULT false, --not used is simple client example
+	  enabled boolean DEFAULT false, --not used in the simple client example
 	  CONSTRAINT since_checkpoint_pkey PRIMARY KEY (pgtable)
 	)
 
