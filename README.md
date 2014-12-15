@@ -133,6 +133,25 @@ Update some of the docs
       test6 | "70"
      (7 rows)
 
+Initially I didnt spot the above order being wrong so you need to be careful.
+
+      SELECT id, CAST(doc->>'myvar' AS numeric) as myvar FROM example 
+      WHERE id LIKE 'test%' AND CAST(doc->>'myvar' AS numeric) > 50
+      ORDER BY myvar, doc->>'_id'
+
+       id   | myvar 
+     -------+-------
+      test7 | "60"
+      test5 | "70"
+      test6 | "70"
+      test1 | "100"
+      test2 | "100"
+      test3 | "100"
+      test4 | "100"
+     (7 rows)
+     
+Order is now correct.
+
 
 And finally in couch
 
