@@ -255,6 +255,25 @@ Add function to put data into couchdb:
     $BODY$
     LANGUAGE plpgsql VOLATILE  
 
+Add function to modify fields inside the PostgreSQL JSON datatype - from: http://stackoverflow.com/questions/18209625/how-do-i-modify-fields-inside-the-new-postgresql-json-datatype
+
+
+    CREATE OR REPLACE FUNCTION json_object_set_key(json json, key_to_set text, value_to_set anyelement)
+      RETURNS json AS
+    $BODY$
+    SELECT COALESCE(
+      (SELECT ('{' || string_agg(to_json("key") || ':' || "value", ',') || '}')
+         FROM (SELECT *
+                 FROM json_each("json")
+                WHERE "key" <> "key_to_set"
+                UNION ALL
+               SELECT "key_to_set", to_json("value_to_set")) AS "fields"),
+      '{}'
+    )::json
+    $BODY$
+      LANGUAGE sql IMMUTABLE STRICT;
+      
+      
 
 Create table to hold the docs
 
