@@ -3,7 +3,6 @@ couch-to-postgres
 
 Node libary to stream CouchDB changes into PostgreSQL with a simple client example. 
 
-
 By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.
 
 Add a doc to a couch
@@ -150,3 +149,57 @@ And finally in couch
      ]}
  
  
+----------
+
+Example setup and postgres configuration
+    
+    git clone git@github.com:sysadminmike/couch-to-postgres.git
+    
+
+Get needed modules:
+
+    npm install 
+
+
+Edit ./bin/index.js to suite your settings:
+
+    var settings =
+          {
+            couchdb: {
+             url: 'http://192.168.3.21:5984',
+             pgtable:  'example',
+             database: 'example'
+           }
+          };
+
+     pgclient = new pg.Client("postgres://mike@localhost/pgdatabase");
+
+
+Before starting it up create the since_checkpoints table
+
+	CREATE TABLE since_checkpoints
+	(
+	  pgtable text NOT NULL,
+	  since numeric DEFAULT 0,
+	  enabled boolean DEFAULT false, --not used is simple client example
+	  CONSTRAINT since_checkpoint_pkey PRIMARY KEY (pgtable)
+	)
+
+This table is used to store the checkpoint for the database(s) being synced something akin to the couchdb _replicator database.
+
+Create the table to store the couch docs:
+
+    CREATE TABLE example
+    (
+      id text NOT NULL,
+      doc jsonb,
+      CONSTRAINT example_pkey PRIMARY KEY (id)
+    )
+
+Start watching changes
+
+./bin/index.js
+
+It will add a record to the since_checkpoints table and begin syncing.
+
+At this point you can now perform SELECT queries the docs within postgres as in the above example.
