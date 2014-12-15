@@ -325,7 +325,7 @@ The couch-to-postgres-php-dumper script - https://github.com/sysadminmike/couch-
 
 -----
 
-Possible ways to deploy - master-master postgres setup using couchdb main data and setting up replication between all locations using Postgres and Couch as a pair.
+Possible ways to deploy - master-master postgres setup using couchdbs primary data store and setting up replication between all locations using Postgres and Couch as a pair.
 
      Location 1                              Location 2
      Postgres == CouchDB --------------------CouchDB == Postgres
