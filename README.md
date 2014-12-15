@@ -303,6 +303,19 @@ On a test with a couchdb of about 150Mb with 65k docs the node libary complete w
 
 The couch-to-postgres-php-dumper script - https://github.com/sysadminmike/couch-to-postgres-php-dump takes about 28 minutes for the initial sync and 11 secs for a resync.
 
+-----
+
+Possible ways to deploy - master-master postgres setup using couchdb main data and setting up replication between all locations using Postgres and Couch as a pair.
+
+     Location 1                              Location 2
+     Postgres == CouchDB --------------------CouchDB == Postgres
+                                  |
+                                  |
+                              Location 3
+                               CouchDB
+                                  ||
+                                Postgres  
+                               
 
 
 -----
