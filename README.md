@@ -316,7 +316,8 @@ Possible ways to deploy - master-master postgres setup using couchdb main data a
                                   ||
                                 Postgres  
                                
-
+     Where == is the node client performing updates
+     And ---- is couchdb performing replication 
 
 -----
 TODOs 
