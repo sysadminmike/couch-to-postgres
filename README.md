@@ -267,7 +267,7 @@ Create table to hold the docs
     )
 
 
-Create trigger pto stop data being inserted into the table from sql and send off to couch instead
+Create trigger to stop data being inserted into the table from sql and send off to couch instead
 
     CREATE TRIGGER add_doc_to_couch 
     BEFORE INSERT OR UPDATE 
@@ -279,6 +279,7 @@ Note: All queries in postgres must have "from_pg=true" for inserts and updates o
 I plan to reverse this logic and make the libary include this so it will be possible to issue inserts/updates and exclude this field.
 
 You can now start the node client and give it a test.
+
 -----
 
 A few variable to tune in ./lib/index.js need to move to config options
@@ -320,6 +321,7 @@ Possible ways to deploy - master-master postgres setup using couchdb main data a
      And ---- is couchdb performing replication 
 
 -----
+
 TODOs 
 
 Deal with DELETE 
