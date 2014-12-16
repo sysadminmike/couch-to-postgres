@@ -397,12 +397,14 @@ In checkpoint_changes function:
 
     ckwait = 3 * 1000;  
 
-This is how often the stream is checkpointed when the stream is active. I would adjust this depending on how busy you couchdb is.  When the stream is idle this increases to 10 secs.
+This is how often the stream is checkpointed when the stream is active. I would adjust this depending on how busy you couchdb is.  When the stream is idle this increases to 10 secs.  
 
 In startFollowing function there is:
      // The inactivity timer is for time between *changes*, or time between the
      // initial connection and the first change. Therefore it goes here.
      stream.inactivity_ms = 30000;
+
+Maybe use NOTIFY and have node client LISTEN for a message when postgres calls couchdb_put() for the first time (can you do a timer in postgres?? or node will get notified about every update and only needs a wake up after idle time).
 
 -----
 
@@ -438,11 +440,12 @@ TODOs
 
 Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (https://github.com/elasticsearch/elasticsearch-river-couchdb - Indexing Databases with Multiple Types)
 
-Make couchdb_put() handle http status code from headers and make sure its ok
-I dont think it is possible to wrap this in a transaction and perform a rollback.
-Need to look at using bulk updates to couch perhaps?
+Make couchdb_put() handle http status code from headers and make sure its ok.
+Need to look at using bulk updates to couch perhaps? - is it possible to make an array of all changed rows in function trigger calls for update and then submit one big post request instead of individual one - will be much faster on UPDATES to lots of records - may then allow 'transactions' to work (doubtful).
 
 Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
+
+Maybe call a pg function from node client to do insert/update instead of using INSERT/UPDATE directly.
 
 Make into a proper node module and submit to npm - any npm experts?
 
