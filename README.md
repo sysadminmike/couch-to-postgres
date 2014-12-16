@@ -536,3 +536,72 @@ For FreeBSD you need to have curl and gettext-tools installed.
     /usr/bin/install -c -o root -g wheel -m 644 http.control '/usr/local/share/postgresql/extension/'
     /usr/bin/install -c -o root -g wheel -m 644 http--1.0.sql '/usr/local/share/postgresql/extension/'
 
+
+
+-------------------
+
+Futher thoughts and testing:
+
+
+Update to all records in test articles db - 
+
+	SELECT id , doc->>'read' FROM articlespg WHERE doc->>'read'='false'
+
+	couchplay=> SELECT id , doc->>'read' FROM articlespg WHERE doc->>'read'='false'
+	couchplay-> 
+	couchplay-> ;
+		id        | ?column? 
+	------------------+----------
+	 _design/mw_views | false
+	(1 row)
+
+
+Returns just the design doc.
+
+
+On running:
+
+      UPDATE articlespg 
+      SET doc = json_object_set_key(doc::json, 'read'::text, true)::jsonb, from_pg=true ;
+
+Something interesting happens with the feed and postgres - I think postgres locks the table while the update takes place as the feeder carries on querying couch but does not update postgres until the update is complete.
+
+While the query is runing you can see the commit sequence in couch updating:
+
+	articlespg: {"db_name":"articlespg","doc_count":63838,"doc_del_count":2,"update_seq":233296,"purge_seq":0,"compact_running":false,"disk_size":2145373958,"data_size":214959726,"instance_start_time":"1418762851354294","disk_format_version":6,"committed_update_seq":233224}
+	articlespg: Checkpoint 192414 is current next check in: 10 seconds
+	PG_WATCHDOG: OK
+
+	articlespg: {"db_name":"articlespg","doc_count":63838,"doc_del_count":2,"update_seq":242301,"purge_seq":0,"compact_running":false,"disk_size":2234531964,"data_size":215440194,"instance_start_time":"1418762851354294","disk_format_version":6,"committed_update_seq":242301}
+	articlespg: Checkpoint 192414 is current next check in: 10 seconds
+	PG_WATCHDOG: OK
+
+As soon as I get a return for the query the feed goes mad so think postgres has locked the table while the update runs.
+
+The UPDATE takes 475 seconds to return
+The river then takes about 3 minutes to catch up after the return
+So about 10 minutes to do an update on all 60k records.
+
+I need to look at the bulk updates as i do now think it is possible to do all or nothing update and possible do in a transaction - i think if 2 updates to couch were issued and the second failed then the first would have still taken place as far as couch is concerned.  
+At the moment if a single PUT were to fail postgres assume no data has been updated but all of the docs up to then would have been updated - in a bulk this would not be a problem i think.  Note so far not one insert or update has failed but i havent killed couch 1/2 way through.
+
+
+
+
+This did give me an idea for another use for this.  Populate a new couchdb from a subset of the couchdb tables in postgres by simply updating the put_function to temporarly submit updates to a different ip or db eg:
+
+    --SELECT headers FROM http_post('http://192.168.3.21:5984/' || TG_TABLE_NAME || '/' || NEW.id::text, '', NEW.doc::text, 'application/json'::text) INTO RES;    
+      SELECT headers FROM http_post('http://192.168.3.21:5984/articlespg-subset' || '/' || NEW.id::text, '', NEW.doc::text, 'application/json'::text) INTO RES;    
+
+Then re-run the update but with a WHERE
+
+    UPDATE articlespg 
+    SET doc = json_object_set_key(doc::json, 'read'::text, true)::jsonb, from_pg=true 
+    WHERE doc ->>'feedName' ='::Planet PostgreSQL::';
+
+About 10 secs later a populated couchdb with just 761 docs matching the WHERE:
+
+    {"db_name":"articlespg-subset","doc_count":761,"doc_del_count":0,"update_seq":761,"purge_seq":0,"compact_running":false,"disk_size":6107249,"data_size":3380130,"instance_start_time":"1418770153501066","disk_format_version":6,"committed_update_seq":761}
+
+A lot simpler that creating a design doc for a one of filtered replication.
+There is no reason why you couldnt do a union on two couch db tables in posgres and merge them into a new couchdb providided there are no id issues.
