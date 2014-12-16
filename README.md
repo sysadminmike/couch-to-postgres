@@ -443,7 +443,7 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
 
 -----
 
-TODOs 
+IDEAS/TODOS - Comments most welcome.
 
 Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (https://github.com/elasticsearch/elasticsearch-river-couchdb - Indexing Databases with Multiple Types)
 
@@ -462,7 +462,17 @@ I dont think works with _attachments - or is ignoring them - as they are in couc
 
 Look at: https://www.npmjs.com/package/forever for keeping client up in case of issue
 
-Replace put function with https://github.com/jchris/hovercraft - needs erlang extension For postgres like PL/Perl - any one know if this exists as i think it would be quite simple to embed hovercraft in postgres then and should then be possible to do proper transactions and do very large updates (i havnt tried more than a few dozen docs at the moment)
+Replace put function with https://github.com/jchris/hovercraft - needs erlang extension For postgres like PL/Perl - any one know if this exists as i think it would be quite simple to embed hovercraft in postgres then and should then be possible to do proper transactions and do very large updates (i havnt tried more than a few dozen docs at the moment) - oif no pl/erlang then perhaps using pl/sh - https://github.com/petere/plsh
+
+    cat ~/.bashrc | erl -noshell -s rot13 rot13 | wc
+http://www.erlang.org/faq/how_do_i.html
+
+and do something like:
+http://www.softwarepassion.com/importing-data-to-couchdb-java-ruby-and-erlang-way/
+
+Maybe have 2 options so one for when postgres and couch are on the same machine and can communicate via pipes (for bulk updates I am sure this will be the fastest method without PL/Erlang plus less bits to go wrong and maybe with exit codes from the shell transactions could be possible) and another version for calls over http.
+
+
 
 -----
 
