@@ -604,4 +604,6 @@ About 10 secs later a populated couchdb with just 761 docs matching the WHERE:
     {"db_name":"articlespg-subset","doc_count":761,"doc_del_count":0,"update_seq":761,"purge_seq":0,"compact_running":false,"disk_size":6107249,"data_size":3380130,"instance_start_time":"1418770153501066","disk_format_version":6,"committed_update_seq":761}
 
 A lot simpler that creating a design doc for a one of filtered replication.
-There is no reason why you couldnt do a union on two couch db tables in posgres and merge them into a new couchdb providided there are no id issues.
+There is no reason why you couldnt do a union on two couch db tables in posgres and merge them into a new couchdb provided there are no id issues.
+
+I have also done a quick test with excel and ms query & access and a passthrough sql query both via odbc to postgres - i can see the couch data both - this makes ad hoc reports so simple.
