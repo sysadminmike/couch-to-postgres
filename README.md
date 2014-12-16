@@ -292,7 +292,7 @@ Start watching changes
 
 It will add a record to the since_checkpoints table and begin syncing.
 
-At this point you can now perform SELECT queries the docs within postgres as in the above example.  
+At this point you can now perform SELECT queries the docs within postgres as in the above example.  This should be fine to use against a production couchdb as it makes no changes to and is performing the same tasks as the elastic search river plugin.  With a bit of copy/pasting it is possible to use sql to create simple scripts or one liners to run in a shell with curl.
 
 
 -------
