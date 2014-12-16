@@ -415,6 +415,13 @@ On a test with a couchdb of about 150Mb with 65k docs the node libary complete w
 
 The couch-to-postgres-php-dumper script - https://github.com/sysadminmike/couch-to-postgres-php-dump takes about 28 minutes for the initial sync and 11 secs for a resync.
 
+Replicating the same db from one jail running couch to another couch jail on the same machine as a baseline takes just over 8 minutes:
+
+    {"session_id":"661411f2137c64efc940f55b802dc35b","start_time":"Tue, 16 Dec 2014 17:00:05 GMT","end_time":"Tue, 16 Dec 2014 17:08:10 GMT","start_last_seq":0,"end_last_seq":92862,"recorded_seq":92862,"missing_checked":63840,"missing_found":63840,"docs_read":63840,"docs_written":63840,"doc_write_failures":0}
+    
+Looking at top I think postgres is waiting on the disk most of the time rather than the process being cpu bound - the single php process calling curl for each doc was hitting the cpu hard and couldnt be used as a solution for huge databases or have the ability to deal with more than one db at once.
+
+
 -----
 
 Possible ways to deploy - master-master postgres setup using couchdbs primary data store and setting up replication between all locations using Postgres and Couch as a pair.
