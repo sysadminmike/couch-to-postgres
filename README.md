@@ -455,6 +455,8 @@ I dont think works with _attachments - or is ignoring them - as they are in couc
 
 Look at: https://www.npmjs.com/package/forever for keeping client up in case of issue
 
+For postgres and erlang expert Replace put function in postgres postgres extension like Hovercraft 
+
 -----
 
 Note: On pgsql-http module install:
