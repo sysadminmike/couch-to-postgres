@@ -322,7 +322,7 @@ If you havent already done it:
       since numeric DEFAULT 0,
       enabled boolean DEFAULT false,
       CONSTRAINT since_checkpoint_pkey PRIMARY KEY (pgtable)
-    )
+    );
 
 
 Add function to put data into couchdb:
@@ -372,8 +372,8 @@ Create table to hold the docs
       id text NOT NULL,
       doc jsonb,
       from_pg boolean, -- for trigger nothing stored here
-      CONSTRAINT example_pkey PRIMARY KEY (id);
-    )
+      CONSTRAINT example_pkey PRIMARY KEY (id)
+    );
 
 
 Create trigger to stop data being inserted into the table from sql and send off to couch instead
