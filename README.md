@@ -421,6 +421,41 @@ Replicating the same db from one jail running couch to another couch jail on the
     
 Looking at top I think postgres is waiting on the disk most of the time rather than the process being cpu bound - the single php process calling curl for each doc was hitting the cpu hard and couldnt be used as a solution for huge databases or have the ability to deal with more than one db at once.
 
+On further testing with some dogey postgres conf settings:
+
+    fsync = off
+    synchronous_commit = off
+    
+As postgres is not the primary datastore its ok if the data dies considering a full rebuild now is under 2 mins:
+
+	mike:~/postgres-couch/couch-to-postgres-test % time ./bin/index.js
+	articlespg: {"db_name":"articlespg","doc_count":63838,"doc_del_count":2,"update_seq":63840,"purge_seq":0,"compact_running":false,"disk_size":242487416,"data_size":205414817,"instance_start_time":"1418749205916149","disk_format_version":6,"committed_update_seq":63840}
+	Connected to postgres
+	articlespg: initial since=0
+	articlespg: Starting checkpointer
+	articlespg: Checkpoint set to 7180 next check in 3 seconds
+	articlespg: Checkpoint set to 9344 next check in 3 seconds
+	articlespg: Checkpoint set to 11536 next check in 3 seconds
+	...
+	articlespg: Checkpoint set to 60920 next check in 3 seconds
+	articlespg: Checkpoint set to 63636 next check in 3 seconds
+	articlespg: Checkpoint set to 63840 next check in 3 seconds
+	articlespg: Checkpoint 63840 is current next check in: 10 seconds
+	^C45.919u 3.226s 1:42.10 48.1%  10864+321k 158+0io 0pf+0w
+	mike:~/postgres-couch/couch-to-postgres-test % 
+
+So down to well under 2 minutes now todo the initial sync of the same test db - so 4 times faster than a native couch to couch sync.  I think this is faster than Elastic search river doing a similar task.
+
+Snippet from top while it was syncing:
+
+	  PID USERNAME    THR PRI NICE   SIZE    RES STATE   C   TIME    WCPU COMMAND
+	57635 mike          6  45    0   621M 66064K uwait   1   0:25  50.78% node
+	57636     70        1  36    0   186M 97816K sbwait  1   0:11  22.75% postgres
+	44831    919       11  24    0   181M 30048K uwait   0  67:28  20.51% beam.smp
+	23891    919       11  20    0   232M 69168K uwait   0  26:22   0.39% beam.smp
+	57624     70        1  20    0   180M 17840K select  0   0:00   0.29% postgres
+	57622     70        1  21    0   180M 65556K select  1   0:00   0.20% postgres
+
 
 -----
 
