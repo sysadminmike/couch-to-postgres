@@ -455,7 +455,7 @@ I dont think works with _attachments - or is ignoring them - as they are in couc
 
 Look at: https://www.npmjs.com/package/forever for keeping client up in case of issue
 
-For postgres and erlang expert Replace put function in postgres postgres extension like Hovercraft 
+Replace put function with https://github.com/jchris/hovercraft - needs erlang extension For postgres like PL/Perl - any one know if this exists as i think it would be quite simple to embed hovercraft in postgres then and should then be possible to do proper transactions and do very large updates (i havnt tried more than a few dozen docs at the moment)
 
 -----
 
