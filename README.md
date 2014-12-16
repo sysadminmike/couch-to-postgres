@@ -373,16 +373,19 @@ The couch-to-postgres-php-dumper script - https://github.com/sysadminmike/couch-
 Possible ways to deploy - master-master postgres setup using couchdbs primary data store and setting up replication between all locations using Postgres and Couch as a pair.
 
      Location 1                              Location 2
-     Postgres == CouchDB --------------------CouchDB == Postgres
-                                  |
-                                  |
-                              Location 3
-                               CouchDB
-                                  ||
-                                Postgres  
+     Postgres == CouchDB ---------- CouchDB == Postgres
+                         \        /
+                          \      /
+                           \    /
+                            \  /
+                             \/    
+                         Location 3
+                          CouchDB
+                            ||
+                          Postgres  
                                
-     Where == is the node client keeping the paired postgres up to date
-     And ---- is couchdb performing replication 
+     Where === is the node client keeping the paired postgres up to date
+     And ----- is couchdb performing replication 
 
 -----
 
