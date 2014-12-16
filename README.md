@@ -292,12 +292,12 @@ Start watching changes
 
 It will add a record to the since_checkpoints table and begin syncing.
 
-At this point you can now perform SELECT queries the docs within postgres as in the above example.
+At this point you can now perform SELECT queries the docs within postgres as in the above example.  
 
 
 -------
 
-To handle UPDATE/INSERT/(DELETE todo) more configuration is required.
+To handle UPDATE/INSERT/(DELETE todo) more configuration is required.  Note this is still experimental so I wouldnt point this at any production data.
 
 First install the postgres extension pgsql-http  at https://github.com/pramsey/pgsql-http 
 
