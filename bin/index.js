@@ -4,6 +4,13 @@ var pg = require('pg');
 var PostgresCouchDB = require('../lib');
 
 
+
+//Note there is an error in the simple example which i have not tracked down/fixed
+//yet it will not restart the stream from where it left off if the feeder is stopped
+//
+//I am working on the daemon.js in same direcory as this which restarts happily.
+//
+
 var settings = 
       {
         couchdb: {
