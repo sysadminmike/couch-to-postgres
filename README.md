@@ -453,6 +453,7 @@ I am working on a more complex daemon to deal with multiple couchdbs + API to al
 
 I dont think works with _attachments - or is ignoring them - as they are in couch and I think postgres is more use manipulating/generating reports/ad hoc queries on the data rather than dealing with attahments.
 
+Look at: https://www.npmjs.com/package/forever for keeping client up in case of issue
 -----
 
 Note: On pgsql-http module install:
