@@ -381,7 +381,7 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
                                   ||
                                 Postgres  
                                
-     Where == is the node client performing updates
+     Where == is the node client keeping the paired postgres up to date
      And ---- is couchdb performing replication 
 
 -----
