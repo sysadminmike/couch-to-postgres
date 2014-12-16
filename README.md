@@ -3,7 +3,7 @@ couch-to-postgres
 
 Node libary to stream CouchDB changes into PostgreSQL with a simple client example.  Based on https://github.com/orchestrate-io/orchestrate-couchdb.
 
-By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.
+By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.
 
 Add a doc to a couch
 
