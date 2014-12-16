@@ -187,7 +187,7 @@ On another couch database with a 'type' field for different doc types stored in 
 Takes under a second.
 
     SELECT DISTINCT doc->>'type' as doctype, jsonb_object_keys(doc) AS myfields
-    FROM lupinsys
+    FROM mytable
     ORDER BY doctype , myfields;
     
 With no indexes the above query takes just over 10 secs.  I have made no indexes or adjustments to the default FreeBSD postgresql94-server-9.4.r1 port.
