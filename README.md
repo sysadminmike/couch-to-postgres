@@ -391,7 +391,7 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
 
 TODOs 
 
-Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (deleted docs are missed with multiple indexes)
+Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (https://github.com/elasticsearch/elasticsearch-river-couchdb - Indexing Databases with Multiple Types)
 
 Make couchdb_put() handle http status code from headers and make sure its ok
 I dont think it is possible to wrap this in a transaction and perform a rollback.
