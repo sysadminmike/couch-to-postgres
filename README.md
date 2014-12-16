@@ -168,6 +168,31 @@ And finally in couch
      ]}
  
  
+ Testing with my articles database from birdreader - https://github.com/glynnbird/birdreader 
+ 
+    curl -X GET http://localhost:5984/articles
+    {"db_name":"articles","doc_count":63759,"doc_del_count":2,"update_seq":92467,"purge_seq":0,"compact_running":false,"disk_size":151752824,"data_size":121586165,"instance_start_time":"1418686121041424","disk_format_version":6,"committed_update_seq":92467}
+ 
+ 
+    SELECT DISTINCT jsonb_object_keys(doc) AS myfields
+    FROM articles ORDER BY myfields
+
+This queries all of the documents and retrieves the couch documents fields.
+
+On another couch database with a 'type' field for different doc types stored in the same database - about 70k docs.
+
+    SELECT DISTINCT doc->>'type' as doctype, count(doc->>'type')
+    FROM mytable GROUP BY doctype ORDER BY doctype 
+
+Takes under a second.
+
+    SELECT DISTINCT doc->>'type' as doctype, jsonb_object_keys(doc) AS myfields
+    FROM lupinsys
+    ORDER BY doctype , myfields;
+    
+With no indexes the above query takes just over 10 secs.  I have made no indexes or adjustments to the default FreeBSD postgresql94-server-9.4.r1 port.
+ 
+I have not stress tested the INSERT/UPDATE stuff.
 ----------
 
 Example setup and postgres configuration
