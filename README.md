@@ -394,8 +394,9 @@ Make couchdb_put() handle http status code from headers and make sure its ok
 I dont think it is possible to wrap this in a transaction and perform a rollback.
 Need to look at using bulk updates to couch perhaps?
 
-
 Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
+
+Make into a proper node module and submit to npm - any npm experts?
 
 I am working on a more complex daemon to deal with multiple couchdbs + API to allow adding removing of steams and recovering from postgres or couchdb restarting/loosing connection so may need to make a few changes to the libary. 
 
