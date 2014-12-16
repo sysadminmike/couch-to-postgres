@@ -168,6 +168,24 @@ And finally in couch
      ]}
  
 It is also possible to use a couchdb view as a table:
+
+The couch design doc:    
+
+    {
+      "_id": "_design/mw_views",
+      "language": "javascript",
+      "views": {
+          "by_feedName": {
+          "map": "function(doc) { emit(doc.feedName,null); }",
+          "reduce": "_count"
+        },
+        "by_tags": {
+          "map": "function(doc) { for(var i in doc.tags) { emit (doc.tags[i],null);  } }",
+          "reduce": "_count"
+        }
+     }
+    }
+ 
  
     WITH by_feedname_reduced AS (
       SELECT * FROM json_to_recordset(
