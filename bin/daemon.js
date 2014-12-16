@@ -312,23 +312,3 @@ setTimeout(function() {
 
 
 
-/*
-var fueltreat_importer = new PostgresCouchDB(pgclient, {
-  couchdb: {
-    url: 'http://192.168.3.23:5984',
-    pgtable:  'fueltreat',
-    database: 'lupin_sys_company_fueltreat_production'
-  }
-});
-     console.log('fueltreat----------------------');
-*/
-/*
-var duluxgroup_importer = new PostgresCouchDB(pgclient, {
-  couchdb: {
-    url: 'http://192.168.3.23:5984',
-    pgtable:  'duluxgroup',
-    database: 'lupin_sys_company_duluxgroup_production'
-  }
-});
-     console.log('duluxgroup----------------------');
-*/
