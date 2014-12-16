@@ -167,6 +167,33 @@ And finally in couch
      {"id":"test7","key":"test7","value":"60"}
      ]}
  
+It is also possible to use a couchdb view as a table:
+ 
+    WITH by_feedname_reduced AS (
+      SELECT * FROM json_to_recordset(
+        (
+         SELECT  (content::json->>'rows')::json  
+         FROM http_get('http://192.168.3.23:5984/articles/_design/mw_views/_view/by_feedName?group=true'))
+        ) AS x (key text, value text)
+    )
+
+    SELECT * FROM by_feedname_reduced WHERE value::numeric > 6000 ORDER BY key 
+ 
+ This takes under a second to run.
+ 
+ The equivilent query using the the data in postgres 
+ 
+    WITH tbl AS (
+        SELECT DISTINCT doc->>'feedName' as key, COUNT(doc->>'feedName') AS value 
+        FROM articles
+        GROUP BY doc->>'feedName'
+    )
+    SELECT key, value FROM tbl WHERE value > 6000 ORDER BY key:
+ 
+ This takes over 4 seconds.
+ 
+ 
+ 
  
  Testing with my articles database from birdreader - https://github.com/glynnbird/birdreader 
  
