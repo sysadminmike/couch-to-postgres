@@ -1,7 +1,7 @@
 couch-to-postgres
 =================
 
-Node libary to stream CouchDB changes into PostgreSQL with a simple client example. 
+Node libary to stream CouchDB changes into PostgreSQL with a simple client example.  Based on https://github.com/orchestrate-io/orchestrate-couchdb.
 
 By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.
 
@@ -290,7 +290,7 @@ Add function to put data into couchdb:
        RETURN NEW;
      ELSE 
        
-       SELECT headers FROM http_post('http://192.168.3.21:5984/' || TG_TABLE_NAME || '/' || NEW.id::text, '', NEW.doc::text, 'application/json'::text) INTO RES;    
+       SELECT status FROM http_post('http://192.168.3.21:5984/' || TG_TABLE_NAME || '/' || NEW.id::text, '', NEW.doc::text, 'application/json'::text) INTO RES;    
 
        --Need to check RES for response code
        --RAISE EXCEPTION 'Result: %', RES;
