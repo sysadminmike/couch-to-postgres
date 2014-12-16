@@ -197,7 +197,7 @@ The couch design doc:
 
     SELECT * FROM by_feedname_reduced WHERE value::numeric > 6000 ORDER BY key 
  
- This takes under a second to run.
+ This takes under a second to run but the initial build of the view takes about 20 mins for a fresh copy of the couchdb.
  
  The equivilent query using the the data in postgres 
  
