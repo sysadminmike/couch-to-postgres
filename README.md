@@ -192,7 +192,7 @@ Takes under a second.
     
 With no indexes the above query takes just over 10 secs.  I have made no indexes or adjustments to the default FreeBSD postgresql94-server-9.4.r1 port.
  
-I have not stress tested the INSERT/UPDATE stuff.
+I have not stress tested the INSERT/UPDATE from postrgres on large numbers of updates. 
 
 ----------
 
@@ -388,7 +388,12 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
 
 TODOs 
 
-Deal with DELETE 
+Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (deleted docs are missed with multiple indexes)
+
+Make couchdb_put() handle http status code from headers and make sure its ok
+I dont think it is possible to wrap this in a transaction and perform a rollback.
+Need to look at using bulk updates to couch perhaps?
+
 
 Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
 
