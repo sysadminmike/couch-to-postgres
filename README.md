@@ -403,6 +403,8 @@ Make into a proper node module and submit to npm - any npm experts?
 
 I am working on a more complex daemon to deal with multiple couchdbs + API to allow adding removing of steams and recovering from postgres or couchdb restarting/loosing connection so may need to make a few changes to the libary. 
 
+I dont think works with _attachments - or is ignoring them - as they are in couch and I think postgres is more use manipulating/generating reports/ad hoc queries on the data rather than dealing with attahments.
+
 -----
 
 Note: On pgsql-http module install:
