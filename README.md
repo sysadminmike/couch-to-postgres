@@ -304,14 +304,6 @@ To handle UPDATE/INSERT/DELETE more configuration is required.  Note this is sti
 
 First install the postgres extension pgsql-http  at https://github.com/pramsey/pgsql-http 
 
-Before compling a small change need to be made to issue a PUT request instead of POST.
-In http.c line 377:
-
-    //CURL_SETOPT(http_handle, CURLOPT_POST, 1);  //Comment this out 
-    CURL_SETOPT(http_handle, CURLOPT_CUSTOMREQUEST, "PUT");  //Add this 
-
-Note this change may soon not be needed as I think bulk POSTS are the way to go.
-
 See note about pgsql-http module install if you not sure how to install a postgres extension.
 
 Then add it in the database you want to use:
