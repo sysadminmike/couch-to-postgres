@@ -1,9 +1,9 @@
 
 
-You will need 3 terminal open for: , DAEMON, PGSQL, CURL
+You will need 3 terminal open for: DAEMON, PGSQL, CURL
 
 
-# Start up daemon 
+Start up daemon 
 
 		% ./bin/daemon.js
 		DAEMON terminal: Listening on port 8888
@@ -12,21 +12,24 @@ You will need 3 terminal open for: , DAEMON, PGSQL, CURL
 		DAEMON terminal: FINDER: 0 dbs to check found
 		DAEMON terminal: PG_WATCHDOG: OK
 
-# See what happening (TODO: change to /_feeds_status - add /_status about the daemon itself)
+
+See what happening (TODO: change to /_feeds_status - add /_status about the daemon itself)
 
 		CURL terminal:  $ curl 192.168.3.22:8888/_status
  	        CURL terminal:  []
 
-#Add new db to follow
+
+Add new db to follow
 
 		PGSQL terminal: INSERT INTO since_checkpoints (pgtable, since, enabled) VALUES ('articlespg',0,true);
 
-# Wake up the finder - note: this will run periodically so you can just wait a few mins at this point
+
+Wake up the finder - note: this will run periodically so you can just wait a few mins at this point
 
 		CURL terminal:  $ curl 192.168.3.22:8888/_finder
 
 
-# The daemon should now see the new feed to follow
+The daemon should now see the new feed to follow
 
 		DAEMON terminal: /_finder
 		DAEMON terminal: FINDER: One off find started.
@@ -73,7 +76,7 @@ You will need 3 terminal open for: , DAEMON, PGSQL, CURL
 
 
 
-# While the daemon was proccessing through the change log in the CURL terminal:
+While the daemon was proccessing through the change log in the CURL terminal:
 
 		CURL terminal: $ curl 192.168.3.22:8888/_status
 		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"17832","since_checkpoint":"16019"}}]
@@ -85,17 +88,17 @@ You will need 3 terminal open for: , DAEMON, PGSQL, CURL
 		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63338"}}]
 
 
-# If we dont want this feed anymore we can disable or delete it from the since_checkpoints table
+If we dont want this feed anymore we can disable or delete it from the since_checkpoints table
 
 		PGSQL terminal: UPDATE since_checkpoints SET enabled=false WHERE pgtable='articlespg';
 
 
-# We can either wait for the watchdog or force it to run 
+We can either wait for the watchdog or force it to run 
 
 		CURL terminal: $ curl 192.168.3.22:8888/_watchdog
 		CURL terminal: Starting WATCHDOG
 
-# 
+
 
 		DAEMON terminal: /_watchdog
 		DAEMON terminal: WATCHDOG: One off watch started.
@@ -105,43 +108,43 @@ You will need 3 terminal open for: , DAEMON, PGSQL, CURL
 		DAEMON terminal: WATCHDOG: articlespg feed stopped
 
 
-# Lets check what the status is
+Lets check what the status is
 
 		CURL terminal: $ curl 192.168.3.22:8888/_status
 		CURL terminal: [{"feed":"articlespg","status":{"alive":false,"status":"stopped","since":"63338","since_checkpoint":"63338"}}]$ 
 
 
-# Once a stream has been stopped by the watchdog it will then be reaped the next time the watchdog runs again we can force it to run or wait 
+Once a stream has been stopped by the watchdog it will then be reaped the next time the watchdog runs again we can force it to run or wait 
 
 		CURL terminal: $ curl 192.168.3.22:8888/_watchdog
 		CURL terminal: Starting WATCHDOG
 
-# Second pass its now gone
+Second pass its now gone
 
 		DAEMON terminal: /_watchdog
 		DAEMON terminal: WATCHDOG: One off watch started.
 		DAEMON terminal: WATCHDOG: Checking articlespg
 		DAEMON terminal: WATCHDOG: Reaped dead articlespg
 
-#to be sure:
+To be sure:
 
 		CURL terminal: $ curl 192.168.3.22:8888/_status
 		CURL terminal: []
 
 
-#we can now enable it again
+We can now enable it again
 
 		PGSQL terminal: UPDATE since_checkpoints SET enabled=true WHERE pgtable='articlespg';
 
 
 
-#And start the finder 
+And start the finder 
 
 		CURL terminal: curl 192.168.3.22:8888/_finder
 		CURL terminal: Starting FINDER
 
 
-#It will now start the feed again 
+It will now start the feed again 
 
 		DAEMON terminal: /_finder
 		DAEMON terminal: FINDER: One off find started.
@@ -159,7 +162,7 @@ You will need 3 terminal open for: , DAEMON, PGSQL, CURL
 
 What if postgres dies (unlikley) or something else upsets it.
 
-# Stop postgres 
+Stop postgres 
 
 
 		PG_WATCHDOG: OK
