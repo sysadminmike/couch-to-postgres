@@ -503,11 +503,12 @@ How to do bulk updates:
       'application/json'::text) ;    
 
 I tried on the articles test db i am using and it was very fast for an update to < 100 rows
-I then tried to update all docs and crashed couch
+I then tried to update all docs and crashed couch - note on this i had to recompile the http extension for postgres to allow POSTS 
 
     DEBUG:  pgsql-http: queried http://192.168.3.21:5984/articlespg/_bulk_docs
     ERROR:  Failed to connect to 192.168.3.21 port 5984: Connection refused
     couchplay=> 
+    
     
 
 ------
