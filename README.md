@@ -1,4 +1,4 @@
-couch-to-postgres
+couch-to-postgres  /  pgcouch / couchpg
 =================
 
 Node libary to stream CouchDB changes into PostgreSQL with a simple client example.  Based on https://github.com/orchestrate-io/orchestrate-couchdb.
