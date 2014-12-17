@@ -7,6 +7,8 @@ By adding a few some extra bits allows not only for SELECT queries on the data b
 
 Basically it allows postgres to use couchdb as it datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
 
+For example:
+
 Add a doc to a couch
 
       curl -X PUT http://192.168.3.21:5984/example/1234567 -d '{"myvar":"foo"}'
