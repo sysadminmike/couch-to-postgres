@@ -3,7 +3,7 @@ couch-to-postgres  /  pgcouch / couchpg
 
 Node libary to stream CouchDB changes into PostgreSQL with a simple client example.  Based on https://github.com/orchestrate-io/orchestrate-couchdb.
 
-By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/DELETES on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
+By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERT/DELETE on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
 
 Basically it allows postgres to use couchdb as its datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
 
@@ -300,7 +300,7 @@ At this point you can now perform SELECT queries the docs within postgres as in 
 
 -------
 
-To handle UPDATE/INSERT/(DELETE todo) more configuration is required.  Note this is still experimental so I wouldnt point this at any production data.
+To handle UPDATE/INSERT/DELETE more configuration is required.  Note this is still experimental so I wouldnt point this at any production data.
 
 First install the postgres extension pgsql-http  at https://github.com/pramsey/pgsql-http 
 
@@ -309,6 +309,8 @@ In http.c line 377:
 
     //CURL_SETOPT(http_handle, CURLOPT_POST, 1);  //Comment this out 
     CURL_SETOPT(http_handle, CURLOPT_CUSTOMREQUEST, "PUT");  //Add this 
+
+Note this change may soon not be needed as I think bulk POSTS are the way to go.
 
 See note about pgsql-http module install if you not sure how to install a postgres extension.
 
