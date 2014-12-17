@@ -543,7 +543,7 @@ This also makes it very simple to make new databases - just add a new db in couc
        SELECT json_agg(docs) AS bulk_docs, chunk_no FROM chunked GROUP BY chunk_no  ORDER BY chunk_no
     )
     SELECT chunk_no, status FROM chunked_newdocs,
-           http_post('http://192.168.3.21:5984/articlespg/_bulk_docs', '',
+           http_post('http://192.168.3.21:5984/NEW_articlespg_COPY/_bulk_docs', '',
            '{"all_or_nothing":true, "docs":' || (bulk_docs) || '}', 'application/json'::text);  
 
 I think maybe faster than a replication.
