@@ -240,8 +240,7 @@ Takes under a second.
     ORDER BY doctype , myfields;
     
 With no indexes the above query takes just over 10 secs.  I have made no indexes or adjustments to the default FreeBSD postgresql94-server-9.4.r1 port.
- 
-I have not stress tested the INSERT/UPDATE from postrgres on large numbers of updates. 
+
 
 ----------
 
