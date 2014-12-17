@@ -3,7 +3,7 @@ couch-to-postgres  /  pgcouch / couchpg
 
 Node libary to stream CouchDB changes into PostgreSQL with a simple client example.  Based on https://github.com/orchestrate-io/orchestrate-couchdb.
 
-By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
+By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/DELETES on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
 
 Basically it allows postgres to use couchdb as its datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
 
@@ -210,7 +210,7 @@ The couch design doc:
         FROM articles
         GROUP BY doc->>'feedName'
     )
-    SELECT key, value FROM tbl WHERE value > 6000 ORDER BY key:
+    SELECT key, value FROM tbl WHERE value > 6000 ORDER BY key;
  
  This takes over 4 seconds.
  
@@ -483,11 +483,7 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
 
 IDEAS/TODOS - Comments most welcome.
 
-
-Make couchdb_put() handle http status code from headers and make sure its ok.
-
 How to do bulk updates:
-
 
     WITH new_docs AS (
       SELECT json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb AS docs
@@ -566,33 +562,6 @@ I think maybe faster than a replication.
 
 ------
 
-
-
-Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
-
-Maybe call a pg function from node client to do insert/update instead of using INSERT/UPDATE directly.
-
-Make into a proper node module and submit to npm - any npm experts?
-
-I am working on a more complex daemon to deal with multiple couchdbs + API to allow adding removing of steams and recovering from postgres or couchdb restarting/loosing connection so may need to make a few changes to the libary. 
-
-I dont think works with _attachments - or is ignoring them - as they are in couch and I think postgres is more use manipulating/generating reports/ad hoc queries on the data rather than dealing with attahments.
-
-Look at: https://www.npmjs.com/package/forever for keeping client up in case of issue
-
-Replace put function with https://github.com/jchris/hovercraft - needs erlang extension For postgres like PL/Perl - any one know if this exists as i think it would be quite simple to embed hovercraft in postgres then and should then be possible to do proper transactions and do very large updates (i havnt tried more than a few dozen docs at the moment) - oif no pl/erlang then perhaps using pl/sh - https://github.com/petere/plsh
-
-    cat ~/.bashrc | erl -noshell -s rot13 rot13 | wc
-http://www.erlang.org/faq/how_do_i.html
-
-and do something like:
-http://www.softwarepassion.com/importing-data-to-couchdb-java-ruby-and-erlang-way/
-
-Maybe have 2 options so one for when postgres and couch are on the same machine and can communicate via pipes (for bulk updates I am sure this will be the fastest method without PL/Erlang plus less bits to go wrong and maybe with exit codes from the shell transactions could be possible) and another version for calls over http.
-
-
-
------
 
 Note: On pgsql-http module install:
 
