@@ -483,7 +483,6 @@ Possible ways to deploy - master-master postgres setup using couchdbs primary da
 
 IDEAS/TODOS - Comments most welcome.
 
-Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (https://github.com/elasticsearch/elasticsearch-river-couchdb - Indexing Databases with Multiple Types)
 
 Make couchdb_put() handle http status code from headers and make sure its ok.
 
@@ -541,18 +540,11 @@ how to deal with the case where there are 5 chunks and the first 2 sucseed but t
 is it possible to rollback a transaction in postgres and give the function oldocs and newdocs 
 then a post_docs chunk fails it can rollback the chunks which have succeeded?
 
-
-
 to be used after like:
 
      SELECT post_docs(json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb,100)
             AS results
      FROM articlespg
-
-
-
--  can be used for INSERTS/UPDATES/DELETES - need to change trigger to not allow any UPDATES or INSERTS on table and then can get rid of the from_pg field.
-
 
 
 
