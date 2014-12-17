@@ -485,6 +485,35 @@ Deal with DELETE - maybe better to use bulk updates and set deletion flag to not
 Make couchdb_put() handle http status code from headers and make sure its ok.
 Need to look at using bulk updates to couch perhaps? - is it possible to make an array of all changed rows in function trigger calls for update and then submit one big post request instead of individual one - will be much faster on UPDATES to lots of records - may then allow 'transactions' to work (doubtful).
 
+
+How to do bulk updates:
+
+
+    WITH new_docs AS (
+      SELECT json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb AS docs
+      FROM articlespg
+    ),
+    agg_docs AS (
+      SELECT json_agg(docs) AS aggjson FROM new_docs
+    )
+
+    SELECT headers FROM 
+      http_post('http://192.168.3.21:5984/articlespg/_bulk_docs', '',
+      '{"all_or_nothing":true, "docs":' || (SELECT * FROM agg_docs) || '}',
+      'application/json'::text) ;    
+
+I tried on the articles test db i am using and it was very fast for an update to < 100 rows
+I then tried to update all docs and crashed couch
+
+    DEBUG:  pgsql-http: queried http://192.168.3.21:5984/articlespg/_bulk_docs
+    ERROR:  Failed to connect to 192.168.3.21 port 5984: Connection refused
+    couchplay=> 
+    
+
+------
+
+
+
 Change logic of from_pg and replace with from_feed, alter lib/index.js and add to all updates/inserts/deletes, update postgres function/trigger as well.
 
 Maybe call a pg function from node client to do insert/update instead of using INSERT/UPDATE directly.
