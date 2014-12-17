@@ -5,7 +5,7 @@ Node libary to stream CouchDB changes into PostgreSQL with a simple client examp
 
 By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
 
-Basically it allows postgres to use couchdb as it datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
+Basically it allows postgres to use couchdb as its datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
 
 For example:
 
@@ -486,8 +486,6 @@ IDEAS/TODOS - Comments most welcome.
 Deal with DELETE - maybe better to use bulk updates and set deletion flag to not upset elastic search couch river (https://github.com/elasticsearch/elasticsearch-river-couchdb - Indexing Databases with Multiple Types)
 
 Make couchdb_put() handle http status code from headers and make sure its ok.
-Need to look at using bulk updates to couch perhaps? - is it possible to make an array of all changed rows in function trigger calls for update and then submit one big post request instead of individual one - will be much faster on UPDATES to lots of records - may then allow 'transactions' to work (doubtful).
-
 
 How to do bulk updates:
 
@@ -533,7 +531,29 @@ However if we split up the request in to smaller chunks:
   
 Chunk size - in this case 50 - i think safe to go to about 500 or 1000 depending on doc size - I tried 1000 to begin with but http_post timed out - and 500 seems to be fine.
 
-Watching the node daemon while running chunked bulk updates i can see the changes streaming back to postgres almost as soon as the start so i think better using an UPDATE as postgres doesnt lock the table while this is happening.
+Watching the node daemon while running chunked bulk updates i can see the changes streaming back to postgres almost as soon as the start so i think better using an UPDATE as postgres doesnt lock the table while this is happening ***Note need to retest this.
+
+However I think better to change all PUTS to bulks POSTS - need a function like:
+
+     post_docs(docs,chunk_size) - returning recordset of status codes? or just true/false?
+
+how to deal with the case where there are 5 chunks and the first 2 sucseed but the 3rd fails?
+is it possible to rollback a transaction in postgres and give the function oldocs and newdocs 
+then a post_docs chunk fails it can rollback the chunks which have succeeded?
+
+
+
+to be used after like:
+
+     SELECT post_docs(json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb,100)
+            AS results
+     FROM articlespg
+
+
+
+-  can be used for INSERTS/UPDATES/DELETES - need to change trigger to not allow any UPDATES or INSERTS on table and then can get rid of the from_pg field.
+
+
 
 
 This also makes it very simple to make new databases - just add a new db in couch and change the url to point to it:
@@ -647,7 +667,8 @@ While the query is runing you can see the commit sequence in couch updating:
 	articlespg: Checkpoint 192414 is current next check in: 10 seconds
 	PG_WATCHDOG: OK
 
-As soon as I get a return for the query the feed goes mad so think postgres has locked the table while the update runs.
+As soon as I get a return for the query the feed goes mad so think postgres has locked the table while the update runs. *** I need to restest this as i may have been doing this test after i introduced a bug stalling the feed on updates.
+
 
 The UPDATE takes 475 seconds to return
 The river then takes about 3 minutes to catch up after the return
