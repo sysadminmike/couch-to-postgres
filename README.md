@@ -304,7 +304,15 @@ To handle UPDATE/INSERT/DELETE more configuration is required.  Note this is sti
 
 First install the postgres extension pgsql-http  at https://github.com/pramsey/pgsql-http 
 
-See note about pgsql-http module install if you not sure how to install a postgres extension.
+See note about pgsql-http module install if you not sure how to install a postgres extension - note this has just been updated to handle PUT and DELETE requests - i have not yet had a chane to test anything i have done on this page with the new version but will try to shortly but think any reference to http_post need updating as the new version specifies:
+
+	http_post(uri VARCHAR, content VARCHAR, content_type VARCHAR)
+	
+But on this page I am using the old one:
+
+	http_post(url VARCHAR, params VARCHAR, data VARCHAR, contenttype VARCHAR DEFAULT NULL)
+	
+So please bear this in mind if setting this up.
 
 Then add it in the database you want to use:
 
@@ -493,7 +501,7 @@ How to do bulk updates:
       'application/json'::text) ;    
 
 I tried on the articles test db i am using and it was very fast for an update to < 100 rows
-I then tried to update all docs and crashed couch - note on this i had to recompile the http extension for postgres to allow POSTS 
+I then tried to update all docs and crashed couch
 
     DEBUG:  pgsql-http: queried http://192.168.3.21:5984/articlespg/_bulk_docs
     ERROR:  Failed to connect to 192.168.3.21 port 5984: Connection refused
