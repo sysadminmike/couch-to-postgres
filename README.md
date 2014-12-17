@@ -513,9 +513,9 @@ However if we split up the request in to smaller chunks:
 
     WITH newdocs AS ( -- Make chage to json here 
       SELECT id, json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb AS docs
-      FROM articlespg --LIMIT 1000
+      FROM articlespg 
     ),
-    chunked AS (  -- Set chunk size - in this case 50 - i think safe to go to about 500 or 1000 depending on doc size
+    chunked AS (  -- get in chunks 
 	SELECT docs, ((ROW_NUMBER() OVER (ORDER BY id) - 1)  / 50) +1 AS chunk_no  
 	FROM newdocs
     ),
@@ -528,6 +528,25 @@ However if we split up the request in to smaller chunks:
            '{"all_or_nothing":true, "docs":' || (bulk_docs) || '}',
            'application/json'::text); 
   
+Chunk size - in this case 50 - i think safe to go to about 500 or 1000 depending on doc size - I tried 1000 to begin with but http_post timed out - and 500 seems to be fine.
+
+Watching the node daemon while running chunked bulk updates i can see the changes streaming back to postgres almost as soon as the start so i think better using an UPDATE as postgres doesnt lock the table while this is happening.
+
+
+This also makes it very simple to make new databases - just add a new db in couch and change the url to point to it:
+
+    chunked AS (
+   	  SELECT docs, ((ROW_NUMBER() OVER (ORDER BY id) - 1)  / 500) +1 AS chunk_no  
+  	  FROM articlespg
+    ),
+    chunked_newdocs AS (
+       SELECT json_agg(docs) AS bulk_docs, chunk_no FROM chunked GROUP BY chunk_no  ORDER BY chunk_no
+    )
+    SELECT chunk_no, status FROM chunked_newdocs,
+           http_post('http://192.168.3.21:5984/articlespg/_bulk_docs', '',
+           '{"all_or_nothing":true, "docs":' || (bulk_docs) || '}', 'application/json'::text);  
+
+I think maybe faster than a replication.
 
 
 ------
