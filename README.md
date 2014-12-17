@@ -5,7 +5,7 @@ Node libary to stream CouchDB changes into PostgreSQL with a simple client examp
 
 By adding a few some extra bits allows not only for SELECT queries on the data but also UPDATE/INSERTS/(DELETES todo) on your couchdb docs within Postgres.  It is also possible to use your couch views as tables.  
 
-Basically it allows postgres to use couchdb as it datastore - sort of like a Foreign Data Wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
+Basically it allows postgres to use couchdb as it datastore - sort of like a Foreign Data Wrapper https://wiki.postgresql.org/wiki/Foreign_data_wrappers eg couchdb_fdw - but has a near realtime copy of records in postgres.
 
 Add a doc to a couch
 
