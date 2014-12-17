@@ -509,6 +509,7 @@ I then tried to update all docs and crashed couch - note on this i had to recomp
     ERROR:  Failed to connect to 192.168.3.21 port 5984: Connection refused
     couchplay=> 
     
+I think if i can get json_agg(docs) AS aggjson to split up the docs into chunks of maybe 1000 at a time this may be the best way to do it.
     
 
 ------
