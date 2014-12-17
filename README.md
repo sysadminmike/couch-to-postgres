@@ -509,8 +509,26 @@ I then tried to update all docs and crashed couch - note on this i had to recomp
     ERROR:  Failed to connect to 192.168.3.21 port 5984: Connection refused
     couchplay=> 
     
-I think if i can get json_agg(docs) AS aggjson to split up the docs into chunks of maybe 1000 at a time this may be the best way to do it. If each batch is sent as its own update then the feeder will can start to pump the updated docs back into postgres before it has finished.
-    
+However if we split up the request in to smaller chunks:
+
+    WITH newdocs AS ( -- Make chage to json here 
+      SELECT id, json_object_set_key(doc::json, 'test'::text, 'Couch & Postgres are scool'::text)::jsonb AS docs
+      FROM articlespg --LIMIT 1000
+    ),
+    chunked AS (  -- Set chunk size - in this case 50 - i think safe to go to about 500 or 1000 depending on doc size
+	SELECT docs, ((ROW_NUMBER() OVER (ORDER BY id) - 1)  / 50) +1 AS chunk_no  
+	FROM newdocs
+    ),
+    chunked_newdocs AS (  -- Bulk up bulk_docs chunks to send 
+        SELECT json_agg(docs) AS bulk_docs, chunk_no FROM chunked GROUP BY chunk_no  ORDER BY chunk_no
+    )
+
+    SELECT chunk_no, status FROM chunked_newdocs,
+           http_post('http://192.168.3.21:5984/articlespg/_bulk_docs', '',
+           '{"all_or_nothing":true, "docs":' || (bulk_docs) || '}',
+           'application/json'::text); 
+  
+
 
 ------
 
