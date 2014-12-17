@@ -662,3 +662,7 @@ A lot simpler that creating a design doc for a one of filtered replication.
 There is no reason why you couldnt do a union on two couch db tables in posgres and merge them into a new couchdb provided there are no id issues.
 
 I have also done a quick test with excel and ms query & access and a passthrough sql query both via odbc to postgres - i can see the couch data in both - this makes ad hoc reports so simple.
+
+Note on name - I think I like postcouch best - and i think most of the work will be done by http_post function POSTing (from postgres) to couchdb
+
+(I think a good idea to also also give option to do PUTS) 
