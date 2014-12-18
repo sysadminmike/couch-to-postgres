@@ -595,8 +595,9 @@ For FreeBSD you need to have curl and gettext-tools installed.
 
 -------------------
 
-Futher thoughts and testing:
+Futher thoughts and ideas/questions or want to help?  https://github.com/sysadminmike/couch-to-postgres/issues
 
+More testing:
 
 Update to all records in test articles db - 
 
