@@ -3,8 +3,9 @@
 var Q = require('kew');
 var pg = require('pg');
 var PostgresCouchDB = require('../lib');
+var DaemonSettings = require('../config/daemon.js');
 
-
+var daemon_settings = new DaemonSettings();
 
 var PostgresCouchContainer = [];
 
@@ -23,7 +24,7 @@ var watch_once = false; //stop watchdog calling itself if invoked via http
 var postgres_dead = true;
 
 /*
-note: if the db in couch is not found then the feed alive is set to false 
+note: if the db in couch is not found then the feed alive is set to false
 the watchdog will reap this feed but it will get re-added the next
 time findFeeds executes.
 */
@@ -34,7 +35,13 @@ var pgclient = '';
 
 function connectPostgres(do_one_find){
     if(postgres_dead == true){
-	pgclient = new pg.Client("postgres://mike@localhost/couchplay");
+  pg_client_url = "postgres://" +
+                  daemon_settings["postgres"]["username"] +
+                  ":" + daemon_settings["postgres"]["password"] +
+                  "@" + daemon_settings["postgres"]["host"] +
+                  "/" + daemon_settings["postgres"]["database"];
+
+	pgclient = new pg.Client(pg_client_url);
 	pgclient.connect(function(err) {
 	    if (err) {
                 if(err.code == 'ECONNREFUSED'){ //try to catch here but i dont think works
@@ -51,7 +58,7 @@ function connectPostgres(do_one_find){
 		        setTimeout(function() {
 		            //console.log('');
         		    findFeeds(true)
-		        }, 3000);        
+		        }, 3000);
 		}
 	    }
 	});
@@ -63,17 +70,17 @@ function connectPostgres(do_one_find){
 process.on('uncaughtException', function (err) {
   if (err.code == 'ECONNREFUSED'){ //not sure where this one come from postgres or couch - i think socket lib err so is the same for pg & couch
         console.error('ERROR: ECONNREFUSED - Node NOT Exiting...');
-//        postgres_dead = true; // we dont know this for sure - may have been set somewhere else 
-	feedsWatchdog(true); //should kill all feeds 
+//        postgres_dead = true; // we dont know this for sure - may have been set somewhere else
+	feedsWatchdog(true); //should kill all feeds
 
-  }else if ( (err.code=='ECONNRESET') | 
-       (err.code=='ECONNABORTED') | 
-       (err.file=='postgres.c' & err.severity=='FATAL')     
+  }else if ( (err.code=='ECONNRESET') |
+       (err.code=='ECONNABORTED') |
+       (err.file=='postgres.c' & err.severity=='FATAL')
 
      ){
 	console.error("Postgresl connection died - Node NOT Exiting...",err);
         postgres_dead = true;
-	feedsWatchdog(true); //should kill all feeds 
+	feedsWatchdog(true); //should kill all feeds
   }else{
 	console.error('UNKNOWN ERR - exiting',err);
  	//perhaps make a shutdown function
@@ -105,7 +112,7 @@ function findFeeds(find_once) {
                     couchdb = pgtable;
                     PostgresCouchContainer[pgtable] = new PostgresCouchDB(pgclient, {
                         couchdb: {
-                            url: 'http://192.168.3.21:5984', 
+                            url: daemon_settings["couchdb"]["url"],
                             pgtable: pgtable,
                             since: result.rows[i].since,
                             database: couchdb
@@ -135,7 +142,7 @@ function findFeeds(find_once) {
                     PostgresCouchContainer[pgtable].events.on('stop', function(key) {
                         console.log(key + ': stopped');
                     });
-                } //undefined check	
+                } //undefined check
             } //for loop
         }
      }); //pgclient
@@ -189,7 +196,7 @@ function feedsWatchdog(watch_once) {
         } else if (PostgresCouchContainer[pgtbl].alive() == false) {
             delete PostgresCouchContainer[pgtbl];
             console.log('WATCHDOG: Reaped dead ' + pgtbl);
-        } else { 
+        } else {
             reaperCheck(pgtbl)
         }
     }
@@ -271,14 +278,14 @@ function onRequest(request, response) {
                 if (typeof PostgresCouchContainer[pgtbl] == "undefined") { //is possble that watchdog has cleared dead object
                         status[pgtbl] = { alive: false, checkpoint: false };
                 } else {
-                        status.push ( { feed: pgtbl, status: { alive: PostgresCouchContainer[pgtbl].alive(), 
+                        status.push ( { feed: pgtbl, status: { alive: PostgresCouchContainer[pgtbl].alive(),
                                                                status: PostgresCouchContainer[pgtbl].status(),
                                                                since: PostgresCouchContainer[pgtbl].since().toString(),
                                                                since_checkpoint: PostgresCouchContainer[pgtbl].since_checkpoint().toString()
 							//% complete
-							//time running 
+							//time running
 							//pg rec cound, pg table size,
-                                                        //couch rec count, couch update seq, couch size?	
+                                                        //couch rec count, couch update seq, couch size?
                                                              }
                                      } );
 		}
@@ -297,11 +304,11 @@ console.log('Listening on port ' + control_port);
 
 connectPostgres(true); //connect and run feedFinder once
 
-setTimeout(function() {	        
-    pgWatchdog();  
+setTimeout(function() {
+    pgWatchdog();
 }, pgwatchdog_interval);
 
-setTimeout(function() {	        
+setTimeout(function() {
     findFeeds(false);  //with timeout reinvoke itself
 }, findfeeds_interval);
 
