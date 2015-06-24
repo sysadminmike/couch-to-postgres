@@ -18,8 +18,9 @@
     "changes",
     "transfer"
   ],
-  "author": "MikeW",
+  "author": "Mike Wolman <mike@wolman.co.uk>",
   "license": "BSD",
+  "homepage": "https://github.com/sysadminmike/couch-to-postgres"
   "dependencies": {
 
     "kew": "0.5.0-alpha.1",
