@@ -31,16 +31,21 @@ time findFeeds executes.
 
 var pgclient = '';
 
+function pgClientUrl() {
+  var url_prefix = "postgres://" + daemon_settings["postgres"]["username"];
 
+  var pg_pass = daemon_settings["postgres"]["password"];
+  var url_optional_pass = pg_pass ? (":" + pg_pass) : "";
+
+  var url_postfix = "@" + daemon_settings["postgres"]["host"] +
+                    "/" + daemon_settings["postgres"]["database"];
+
+  return (url_prefix + url_optional_pass + url_postfix);
+};
 
 function connectPostgres(do_one_find){
     if(postgres_dead == true){
-  pg_client_url = "postgres://" +
-                  daemon_settings["postgres"]["username"] +
-                  ":" + daemon_settings["postgres"]["password"] +
-                  "@" + daemon_settings["postgres"]["host"] +
-                  "/" + daemon_settings["postgres"]["database"];
-
+  pg_client_url = pgClientUrl();
 	pgclient = new pg.Client(pg_client_url);
 	pgclient.connect(function(err) {
 	    if (err) {
