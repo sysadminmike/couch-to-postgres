@@ -2,8 +2,14 @@
 
 You will need 3 terminal open for: DAEMON, PGSQL, CURL
 
+Setup Postgresql database and CouchDb settings in
+config/daemon.js
+You can use example file:
+```
+cp config/daemon.js.example config/daemon.js
+```
 
-Start up daemon 
+Start up daemon
 
 		% ./bin/daemon.js
 		DAEMON terminal: Listening on port 8888
@@ -15,7 +21,7 @@ Start up daemon
 
 See what happening (TODO: change to /_feeds_status - add /_status about the daemon itself)
 
-		CURL terminal:  $ curl 192.168.3.22:8888/_status
+		CURL terminal:  $ curl 127.0.0.1:8888/_status
  	        CURL terminal:  []
 
 
@@ -26,7 +32,7 @@ Add new db to follow
 
 Wake up the finder - note: this will run periodically so you can just wait a few mins at this point
 
-		CURL terminal:  $ curl 192.168.3.22:8888/_finder
+		CURL terminal:  $ curl 127.0.0.1:8888/_finder
 
 
 The daemon should now see the new feed to follow
@@ -78,13 +84,13 @@ The daemon should now see the new feed to follow
 
 While the daemon was proccessing through the change log in the CURL terminal:
 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
+		CURL terminal: $ curl 127.0.0.1:8888/_status
 		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"17832","since_checkpoint":"16019"}}]
-		CURL terminal: $ curl 192.168.3.22:8888/_status
-		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"43822","since_checkpoint":"42679"}}]$ 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
-		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63338"}}]$ 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
+		CURL terminal: $ curl 127.0.0.1:8888/_status
+		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"43822","since_checkpoint":"42679"}}]$
+		CURL terminal: $ curl 127.0.0.1:8888/_status
+		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63338"}}]$
+		CURL terminal: $ curl 127.0.0.1:8888/_status
 		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63338"}}]
 
 
@@ -93,9 +99,9 @@ If we dont want this feed anymore we can disable or delete it from the since_che
 		PGSQL terminal: UPDATE since_checkpoints SET enabled=false WHERE pgtable='articlespg';
 
 
-We can either wait for the watchdog or force it to run 
+We can either wait for the watchdog or force it to run
 
-		CURL terminal: $ curl 192.168.3.22:8888/_watchdog
+		CURL terminal: $ curl 127.0.0.1:8888/_watchdog
 		CURL terminal: Starting WATCHDOG
 
 
@@ -110,13 +116,13 @@ We can either wait for the watchdog or force it to run
 
 Lets check what the status is
 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
-		CURL terminal: [{"feed":"articlespg","status":{"alive":false,"status":"stopped","since":"63338","since_checkpoint":"63338"}}]$ 
+		CURL terminal: $ curl 127.0.0.1:8888/_status
+		CURL terminal: [{"feed":"articlespg","status":{"alive":false,"status":"stopped","since":"63338","since_checkpoint":"63338"}}]$
 
 
-Once a stream has been stopped by the watchdog it will then be reaped the next time the watchdog runs again we can force it to run or wait 
+Once a stream has been stopped by the watchdog it will then be reaped the next time the watchdog runs again we can force it to run or wait
 
-		CURL terminal: $ curl 192.168.3.22:8888/_watchdog
+		CURL terminal: $ curl 127.0.0.1:8888/_watchdog
 		CURL terminal: Starting WATCHDOG
 
 Second pass its now gone
@@ -128,7 +134,7 @@ Second pass its now gone
 
 To be sure:
 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
+		CURL terminal: $ curl 127.0.0.1:8888/_status
 		CURL terminal: []
 
 
@@ -138,13 +144,13 @@ We can now enable it again
 
 
 
-And start the finder 
+And start the finder
 
-		CURL terminal: curl 192.168.3.22:8888/_finder
+		CURL terminal: curl 127.0.0.1:8888/_finder
 		CURL terminal: Starting FINDER
 
 
-It will now start the feed again 
+It will now start the feed again
 
 		DAEMON terminal: /_finder
 		DAEMON terminal: FINDER: One off find started.
@@ -154,7 +160,7 @@ It will now start the feed again
 		DAEMON terminal: articlespg: Starting checkpointer
 		DAEMON terminal: articlespg: Checkpoint 63338 is current next check in: 10 seconds
 
-		CURL terminal: $ curl 192.168.3.22:8888/_status
+		CURL terminal: $ curl 127.0.0.1:8888/_status
 		CURL terminal: [{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63338"}}]
 
 
@@ -162,7 +168,7 @@ It will now start the feed again
 
 What if postgres dies (unlikley) or something else upsets it.
 
-Stop postgres 
+Stop postgres
 
 
 		PG_WATCHDOG: OK
@@ -222,7 +228,7 @@ The daemon will terminate all feeds and try to reconnect to postgres, once recon
 		articlespg: Starting checkpointer
 		articlespg: Checkpoint 63338 is current next check in: 10 seconds
 		articlespg: Checkpoint 63338 is current next check in: 10 seconds
-	
+
 
 ------------------
 
@@ -267,14 +273,14 @@ What happens if couchdb dies?
 
 In the curl console when couch was dead:
 
-		$ curl 192.168.3.22:8888/_status
+		$ curl 127.0.0.1:8888/_status
 		[{"feed":"articlespg","status":{"alive":true,"status":"Error: Not connected to couch server trying to reconnect.","since":"63337","since_checkpoint":"63337"}}]
-	
+
 And when couch came back:
 
-		$ curl 192.168.3.22:8888/_status
-		[{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63337"}}]$ 
-	
+		$ curl 127.0.0.1:8888/_status
+		[{"feed":"articlespg","status":{"alive":true,"status":"Following","since":"63338","since_checkpoint":"63337"}}]$
 
 
-	
+
+
