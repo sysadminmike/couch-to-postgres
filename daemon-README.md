@@ -1,13 +1,32 @@
-
-
-You will need 3 terminal open for: DAEMON, PGSQL, CURL
-
 Setup Postgresql database and CouchDb settings in
 config/daemon.js
+
 You can use example file:
 ```
 cp config/daemon.js.example config/daemon.js
 ```
+
+* password can be optional. For example:
+```
+function DaemonSettings() {
+  var credentials = {
+    postgres: {
+      database: "couchplay",
+      username: "mike",
+      host: "localhost"
+    },
+    couchdb: {
+      url: 'http://127.0.0.1:5984'
+    }
+  };
+
+  return credentials;
+};
+
+module.exports = DaemonSettings;
+```
+
+You will need 3 terminal open for: DAEMON, PGSQL, CURL
 
 Start up daemon
 
