@@ -1,10 +1,10 @@
 {
   "name": "couch-to-postgres",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node libary to watch CouchDB_changes and update PostgreSQL",
   "main": "index.js",
   "bin": {
-    "couch-to-postgres": "index.js"
+    "couch-to-postgres": "bin/daemon.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
