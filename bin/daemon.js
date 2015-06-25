@@ -107,14 +107,16 @@ function findFeeds(find_once) {
             process.exit();
         } else {
             var pgtable;
+            var couchdb;
 
             console.log("FINDER: " + result.rows.length + ' dbs to check found');
             for (var i = 0; i < result.rows.length; i++) {
-                pgtable = result.rows[i].pgtable;
+                couchdb = result.rows[i].pgtable;
+                pgtable = couchdb.replace(/\-/g,"_");
+
                 if (PostgresCouchContainer[pgtable] === undefined) {
                     pgtableCheck(pgtable);
 
-                    couchdb = pgtable;
                     PostgresCouchContainer[pgtable] = new PostgresCouchDB(pgclient, {
                         couchdb: {
                             url: daemon_settings["couchdb"]["url"],
