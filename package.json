@@ -1,6 +1,6 @@
 {
   "name": "couch-to-postgres",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node libary to watch CouchDB_changes and update PostgreSQL",
   "main": "index.js",
   "bin": {
