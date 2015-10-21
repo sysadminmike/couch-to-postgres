@@ -130,8 +130,8 @@ function findFeeds(find_once) {
                     console.log('FINDER: Found ' + pgtable + ' processing changes since: ' + result.rows[i].since);
 
                     PostgresCouchContainer[pgtable].events.on('connect', console.log);
-
-                    PostgresCouchContainer[pgtable].events.on('checkpoint', console.log);
+		  
+                    PostgresCouchContainer[pgtable].events.on('checkpoint', console.log);  //Comment out if too much info
                     PostgresCouchContainer[pgtable].events.on('checkpoint.error', function(msg, err) {
                         console.error(msg, err);
                         process.exit(1);
@@ -221,11 +221,11 @@ function pgWatchdog(){
       connectPostgres();
     }else{
       //test postgres connection
-      console.log('PG_WATCHDOG: OK');
+      console.log('PG_WATCHDOG: OK');  //comment out if too much info
     }
     setTimeout(function() {
         pgWatchdog();
-    }, 10000);
+    }, 15000);
 
 }
 
