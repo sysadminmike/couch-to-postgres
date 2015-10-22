@@ -1,0 +1,53 @@
+#!/usr/local/bin/bash
+
+#
+# nagios check script to make sure couchdb & postgres table
+# doc counts match and make sure couch-to-postgres working correctly
+#
+# check_couch_postgres_count.sh 192.168.0.12 192.168.0.13 
+
+couch_host=$1
+postgres_host=$2
+
+difference_threashold=10
+
+dbs=`curl -s http://$couch_host:5984/_all_dbs | json -ga  | grep -v -E '_replicator|_users|articles|feeds|fluent' | sort`
+
+err=""
+msg="$dbs"
+exitcode=0
+
+for db in $dbs; do
+    couch_count=`curl -s http://$couch_host:5984/$db | json doc_count`
+    #if [ -z "$couch_count" ]; then continue; fi #no db
+     
+    postgres_count=`psql -h $postgres_host -d lupin_api_production -Upgsql -wqA -c \
+                   "SELECT count(id) FROM $db" | tail -2 | head -1`
+
+    if [ "$couch_count" -ne "$postgres_count" ]; then
+        if [ "$couch_count" -gt "$postgres_count" ]; then
+             difference=$(($couch_count - $postgres_count))
+        else 
+             difference=$(($postgres_count - $couch_count))
+        fi
+
+        if [[ $difference -gt $difference_threashold ]]; then
+            err+="ERROR - $db count difference $couch_host: $couch_count != $postgres_host: $postgres_count - difference: $difference\n"
+            exitcode=2
+        else
+            err+="WARNING - $db count difference $couch_host: $couch_count != $postgres_host: $postgres_count - difference: $difference\n"
+            if [[ $exitcode -lt 1 ]]; then
+                exitcode=1
+            fi
+        fi
+    fi
+    #echo "$db    $couch_count    $postgres_count    $difference"
+done
+
+if [[ $exitcode -gt 0 ]]; then
+        echo -e -n $err $msg
+        exit $exitcode
+else
+        echo -e "OK - $msg - doc count match"
+        exit $exitcode
+fi
