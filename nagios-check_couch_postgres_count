@@ -4,6 +4,8 @@
 # nagios check script to make sure couchdb & postgres table
 # doc counts match and make sure couch-to-postgres working correctly
 #
+# note this needs json - npm -i json
+#
 # check_couch_postgres_count.sh 192.168.0.12 192.168.0.13 
 
 couch_host=$1
@@ -21,7 +23,7 @@ for db in $dbs; do
     couch_count=`curl -s http://$couch_host:5984/$db | json doc_count`
     #if [ -z "$couch_count" ]; then continue; fi #no db
      
-    postgres_count=`psql -h $postgres_host -d lupin_api_production -Upgsql -wqA -c \
+    postgres_count=`psql -h $postgres_host -d mydb -Upgsql -wqA -c \
                    "SELECT count(id) FROM $db" | tail -2 | head -1`
 
     if [ "$couch_count" -ne "$postgres_count" ]; then
