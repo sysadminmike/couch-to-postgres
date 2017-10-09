@@ -1,6 +1,6 @@
 {
   "name": "couch-to-postgres",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Node libary to watch CouchDB _changes and update PostgreSQL",
   "main": "index.js",
   "bin": {
@@ -22,9 +22,8 @@
   "license": "BSD",
   "homepage": "https://github.com/sysadminmike/couch-to-postgres",
   "dependencies": {
-
     "kew": "0.5.0-alpha.1",
-    "pg": "4.1.1",
+    "pg": "4.5.7",
     "pg-escape": "0.0.3",
     "async": "0.9.0",
     "follow": "0.11.4",
