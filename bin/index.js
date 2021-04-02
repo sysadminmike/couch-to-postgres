@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-var pg = require('pg');
+const { Pool, Client } = require('pg')
 var PostgresCouchDB = require('../lib');
 
-
-
+// old notes from original branch
 //Note there is an error in the simple example which i have not tracked down/fixed
 //yet it will not restart the stream from where it left off if the feeder is stopped
 //
@@ -14,33 +13,29 @@ var PostgresCouchDB = require('../lib');
 var settings = 
       {
         couchdb: {
-         url: 'http://192.168.3.21:5984',
-         pgtable:  'example',
-         database: 'example'
+         url: 'http://administrator:Western5280@cce-server02.office.ccenttcs.com:5984',
+         pgtable:  'couch_import',
+         database: 'tcsmaster'
        }
       };
 
-pgclient = new pg.Client("postgres://mike@localhost/pgdatabase");
+var pgclient = new Client({
+	user: 'morgan',
+  	host: 'cce-server02.office.ccenttcs.com',
+  	database: 'tcs_import',
+  	password: 'Tg8856PG',
+  	port: 5432,
+});
 
+pgclient
+  .connect()
+  .then(() => {
+        console.log('Connected to postgres');
 
-pgclient.connect(function(err) {
-            if (err) {
-                if(err.code == 'ECONNREFUSED'){ //try to catch here but i dont think works
-                        console.error('ERROR: Connection to postgres refused', err);
-                }else{
-                        console.error('ERROR: Could not connect to postgres', err);
-                }
-                process.exit();
-            } else {
-                console.log('Connected to postgres');
-            }
-        }) ;
-
-	
-initial_since = get_initial_since(settings.couchdb.pgtable);
-
-createImporter();
-
+	initial_since = get_initial_since(settings.couchdb.pgtable);
+	createImporter();
+  })
+  .catch(err => console.error('connection error', err.stack))
 
 function createImporter(){
     settings.since = initial_since;
