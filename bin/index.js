@@ -13,17 +13,17 @@ var PostgresCouchDB = require('../lib');
 var settings = 
       {
         couchdb: {
-         url: 'http://administrator:Western5280@cce-server02.office.ccenttcs.com:5984',
+         url: 'http://user:pass@ipAddress:5984',
          pgtable:  'couch_import',
          database: 'tcsmaster'
        }
       };
 
 var pgclient = new Client({
-	user: 'morgan',
-  	host: 'cce-server02.office.ccenttcs.com',
+	user: 'user',
+  	host: 'ipAddress',
   	database: 'tcs_import',
-  	password: 'Tg8856PG',
+  	password: 'pass',
   	port: 5432,
 });
 
